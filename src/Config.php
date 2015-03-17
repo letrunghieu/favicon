@@ -166,6 +166,39 @@ class Config
     }
 
     /**
+     * Export configuration data as an array
+     * 
+     * @return array
+     */
+    public function toArray()
+    {
+        $result = array(
+            'sizes'         => array(),
+            'ms-tile-color' => $this->_msapplicationTileColor,
+        );
+        foreach ($this->_turnedOnSizes as $size => $on)
+        {
+            if ($on)
+            {
+                $result['sizes'][$size] = 1;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Export config data into a file
+     * 
+     * @param string $path
+     * @return boolean
+     */
+    public function toFile($path)
+    {
+        $array = $this->toArray();
+        return file_put_contents($path, json_encode($array, JSON_PRETTY_PRINT));
+    }
+
+    /**
      * Get supported PNG sizes and description
      * 
      * @return array
@@ -173,6 +206,45 @@ class Config
     public static function getSizes()
     {
         return self::$_sizes;
+    }
+
+    /**
+     * Create a configuration object from an array
+     * 
+     * @param array $array
+     * @return \HieuLe\Favicon\Config
+     */
+    public static function fromArray(array $array)
+    {
+        $config = new Config;
+        if (isset($array['sizes']) && is_array($array['sizes']))
+        {
+            foreach ($array['sizes'] as $size => $on)
+            {
+                if ($on)
+                {
+                    $config->turnOn($size);
+                }
+            }
+        }
+        if (isset($array['ms-tile-color']) && is_string($array['ms-tile-color']))
+        {
+            $config->setTileBackground($array['ms-tile-color']);
+        }
+
+        return $config;
+    }
+
+    /**
+     * Parse configuration from a file
+     * 
+     * @param string $path
+     * @return \HieuLe\Favicon\Config
+     */
+    public static function fromFile($path)
+    {
+        $array = json_decode(file_get_contents($path), true);
+        return self::fromArray($array);
     }
 
 }

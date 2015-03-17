@@ -69,4 +69,38 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($sizes);
     }
 
+    public function testToArray()
+    {
+        $config = new Config;
+        $array  = $config->turnOn('touch-144')
+                ->setTileBackground('#f0f0f0')
+                ->toArray();
+
+        $this->assertArrayHasKey('sizes', $array);
+        $this->assertCount(1, $array['sizes']);
+        $this->assertArrayHasKey('touch-144', $array['sizes']);
+        $this->assertEquals(1, $array['sizes']['touch-144']);
+        $this->assertArrayHasKey('ms-tile-color', $array);
+        $this->assertEquals('#f0f0f0', $array['ms-tile-color']);
+    }
+
+    public function testFromArray()
+    {
+        $array  = array(
+            'ms-tile-color' => '#f0f0f0',
+            'bar'           => 'baz',
+            'sizes'         => array(
+                'touch' => 1,
+                'fav'   => false,
+                'foo'   => 'bar',
+            ),
+        );
+        $config = Config::fromArray($array);
+        $sizes  = $config->getTurnedOnSizes();
+        $this->assertEquals('#f0f0f0', $config->getTileBackground());
+        $this->assertCount(1, $sizes);
+        $this->assertArrayHasKey('touch', $sizes);
+        $this->assertEquals(152, $sizes['touch']);
+    }
+
 }
