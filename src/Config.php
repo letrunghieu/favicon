@@ -133,7 +133,7 @@ class Config
      */
     public function setTileBackground($hexColor)
     {
-        $this->_msapplicationTileColor = $hexColor;
+        $this->_msapplicationTileColor = strtoupper($hexColor);
         return $this;
     }
 
