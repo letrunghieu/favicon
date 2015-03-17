@@ -159,7 +159,7 @@ class Config
         {
             if ($on)
             {
-                $result[$size] = self::$_sizes[$size];
+                $result[$size] = self::$_sizes[$size]['size'];
             }
         }
         return $result;
