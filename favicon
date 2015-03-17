@@ -1,7 +1,10 @@
 #!/usr/bin/env php
 <?php
 /*
- * Favicon bin file
+ * favicon bin file
+ *
+ * @copyright Hieu Le
+ *
  */
 
 foreach (array(__DIR__ . '/../../autoload.php', __DIR__ . '/../vendor/autoload.php', __DIR__ . '/vendor/autoload.php') as $file) 
@@ -12,6 +15,7 @@ foreach (array(__DIR__ . '/../../autoload.php', __DIR__ . '/../vendor/autoload.p
         break;
     }
 }
+
 unset($file);
 
 if (!defined('COMPOSER_AUTOLOAD_FILE')) 
@@ -19,7 +23,6 @@ if (!defined('COMPOSER_AUTOLOAD_FILE'))
     fwrite(STDERR, 'You have to use composer to setup library dependencies.');
     die(1);
 }
-
 
 require COMPOSER_AUTOLOAD_FILE;
 
@@ -29,3 +32,4 @@ use Symfony\Component\Console\Application;
 $application = new Application();
 $application->add(new GenerateCommand);
 $application->run();
+
