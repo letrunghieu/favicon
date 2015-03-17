@@ -1,0 +1,24 @@
+#!/usr/bin/env php
+<?php
+foreach (array(__DIR__ . '/../../autoload.php', __DIR__ . '/../vendor/autoload.php', __DIR__ . '/vendor/autoload.php') as $file) {
+    if (file_exists($file)) {
+        define('COMPOSER_AUTOLOAD_FILE', $file);
+        break;
+    }
+}
+unset($file);
+
+if (!defined('COMPOSER_AUTOLOAD_FILE')) {
+    fwrite(STDERR, 'You have to use composer to setup library dependencies.');
+    die(1);
+}
+
+
+require COMPOSER_AUTOLOAD_FILE;
+
+use HieuLe\Favicon\GenerateCommand;
+use Symfony\Component\Console\Application;
+
+$application = new Application();
+$application->add(new GenerateCommand);
+$application->run();

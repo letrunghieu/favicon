@@ -21,6 +21,9 @@
 		"imagine/imagine": "~0.1",
 		"symfony/console": "~2.0"
 	},
+	"bin": [
+        "favicon"
+    ],
 	"config": {
 		"bin-dir": "bin"
 	},
