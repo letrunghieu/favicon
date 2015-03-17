@@ -1,0 +1,28 @@
+{
+    "name": "hieu-le/favicon",
+    "description": "A configurable PHP solution to auto generate favicons and HTML meta tags from a original PNG file.",
+    "type": "library",
+    "keywords": [
+        "favicon",
+        "generate",
+        "png",
+        "ico"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Hieu Le",
+            "email": "letrunghieu.cse09@gmail.com",
+            "homepage": "http://www.hieule.info"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "config": {
+        "bin-dir": "bin"
+    },
+    "autoload": {
+        
+    }
+}
