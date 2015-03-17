@@ -46,6 +46,9 @@ class GenerateCommand extends Command
     {
         $this->_prepareConfig($input, $output);
 
+        $generator = new Generator($this->_config);
+        $generator->run($input->getArgument('input-file'));
+        
         if ($input->getOption('save'))
         {
             $this->_saveJsonConfig($input, $output);
