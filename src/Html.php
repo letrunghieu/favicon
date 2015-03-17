@@ -45,7 +45,7 @@ class Html
      */
     public function output()
     {
-        return implode("\n", array_map([$this, 'getLinkTag'], array_keys($this->_config->getTurnedOnSizes())));
+        return implode("\n", array_map(array($this, 'getLinkTag'), array_keys($this->_config->getTurnedOnSizes())));
     }
 
     /**
