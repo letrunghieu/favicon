@@ -2,30 +2,20 @@
 
 [![Build Status](https://travis-ci.org/letrunghieu/favicon.svg?branch=master)](https://travis-ci.org/letrunghieu/favicon) [![Latest Stable Version](https://poser.pugx.org/hieu-le/favicon/v/stable.svg)](https://packagist.org/packages/hieu-le/favicon) [![Total Downloads](https://poser.pugx.org/hieu-le/favicon/downloads.svg)](https://packagist.org/packages/hieu-le/favicon) [![Latest Unstable Version](https://poser.pugx.org/hieu-le/favicon/v/unstable.svg)](https://packagist.org/packages/hieu-le/favicon) [![License](https://poser.pugx.org/hieu-le/favicon/license.svg)](https://packagist.org/packages/hieu-le/favicon)
 
-A configurable PHP solution to auto generate favicons and HTML meta tags from a original PNG file.
+A configurable PHP solution to auto generate favicons and HTML tags from a original PNG file.
 
 ## What does this package do?
 
 In short, it will help you display correct favicon for your website with just **one** original PNG image.
 
-In more details, this package will generate these stuffs from your PNG image:
+In more details, it supports:
 
-| File name       	| Image size    	| Explanation                                                                                   	|
-|-----------------	|---------------	|-----------------------------------------------------------------------------------------------	|
-| favicon.ico     	| 16x16 & 32x32 	| Default required by IE                                                                        	|
-| favicon-32.png  	| 32x32         	| Favicons targeted to any additional png sizes                                                 	|
-| favicon-57.png  	| 57x57         	| For non-Retina iPhone, iPod Touch, and Android 2.1+ devices                                   	|
-| favicon-72.png  	| 72x72         	| For first- and second-generation iPad, iPad home screen icon                                  	|
-| favicon-114.png 	| 114x114       	| For iPhone with high-resolution Retina display running iOS ≤ 6                                	|
-| favicon-120.png 	| 120x120       	| For iPhone with high-resolution Retina display running iOS ≥ 7                                	|
-| favicon-144.png 	| 144x144       	| For iPad with high-resolution Retina display running iOS ≤ 6, IE10 Metro tile for pinned site 	|
-| favicon-152.png 	| 152x152       	| For iPad with high-resolution Retina display running iOS ≥ 7                                  	|
-
-Except the `ico` file that is allways generated, all other images can included in your final result or not via some configurations. This packages can also generate correct `link` tags for each type of *favicon*. Thanks [audreyr](https://github.com/audreyr/favicon-cheat-sheet) for the cheatsheet that helped me a lot.
+* create **one** ICO file and **many** PNG files with many favicon sizes from just **one** original PNG image as well as a `manifest.json` file for Android devices. Both input file path and output folder (which contains images and json files) are configurable via a command line interface.
+* Generate suitable `meta` and `link` tags for desktop web browsers as well as mobile touch devices to properly display favicon.
 
 ## Installation
 
-We need [PHP imagick extension](http://php.net/manual/en/book.imagick.php) for generating iamges, if you just use the HTML function, this extension is not need.
+We need [PHP imagick extension](http://php.net/manual/en/book.imagick.php) or [PHP GD extension](http://php.net/manual/en/book.image.php) for generating images. By default, the Imagick extension is loaded, if you cannot install it, you can switch to using GD via command line option.
 
 You will need (Composer)[] to use this package. After install Composer, add this dependency into your `composer.json` file.
 
@@ -37,111 +27,65 @@ Run `composer update` and start using.
 
 ## Generate images
 
-The basic syntax: generate the `ico` file only:
+To use the command line to to generate favicon files: 
 
 ```
-$ vendor/bin/favicon generate your-input-image
+$ vendor/bin/favicon generate [-g|--use-gd] [--ico-64] [--ico-48] [--no-old-apple] [--no-android] [--no-ms] [--app-name="..."] input [output]
 ```
 
-To generate all available `png` images along with the default `ico` file:
+Arguments:
 
-```
-$ vendor/bin/favicon generate your-input-image --all
-```
+* `input`: path to the input image files, which is required
+* `output`: path to the folder which contains output files. If this folder does not exist, the package will try to create it. This argument is optional, default value is current folder.
 
-You can choose to generate just come `png` size by use appropritate command line options. To list all available options, use the command:
+Options:
 
-```
-$ vendor/bin/favicon generate --help
-```
+* `--use-gd`: use GD extension instead of Imagick extension
+* `--ico-64`: include the 64x64 image inside the output ICO file (which contains only 16x16 and 32x32 images by default)
+* `--ico-48`: include the 48x48 image inside the output ICO file (which contains only 16x16 and 32x32 images by default). Both `--ico-48` and `--ico-64` options make the output icon file larger a lot.
+* `--no-old-apple`: exclude pngs files that used by old Apple touch devices
+* `--no-android`: exclude `manifest.json` files and PNG files for Android devices
+* `--no-ms`: exclude images for Windows tile
+* `--app-name="..."` set the application name in the `manifest.json` file. Default is an empty string.
 
-To save time, you can use a **config file** which contains a JSON content to tell the generator which images to be include in the result. Intead of passing individual options, tell the generator use a config file by:
+## Output HTML tags
 
-```
-$ vendor/bin/favicon generate your-input-image --config
-```
+Call the `favicon` function inside your HTML template as follow:
 
-By default, the config file is `favicon.json`. However, you can specify another file by using `--config-file` option, for example
-
-```
-$ vendor/bin/favicon generate your-input-image --config --config-file=path/to/json/file
-```
-
-You can save all current settings from command line options to the config file to use later by passing the `--save` option to the command.
-
-## Configuration file
-
-A full configuration file will be like this
-
-```
-{
-    "sizes": {
-        "touch": 1,    /* include 152x152 png for touch devices */
-        "fav": 1,      /* include 32x32 png for all devices */
-        "fav-57": 1,   /* include 57x57 png */
-        "ms": 1,       /* include 144x144 png and other info for windows tile */
-        "touch-152": 1,/* include 152x152 png */
-        "touch-144": 1,/* include 144x144 png */
-        "touch-120": 1,/* include 120x120 png */
-        "touch-114": 1,/* include 114x114 png */
-        "touch-72": 1  /* include 72x72 png */
-    },
-    "ms-tile-color": "#FFFFFF" /* the background color for windows tile */
-}
+```php
+echo favicon($noOldApple = false, $noAndroid = false, $noMs = false, $tileColor = '#FFFFFF', $browserConfigFile = '', $appName = '')
 ```
 
-Some configurations are not used by the generator but for the HTML dumper, which is introduced in the next section.
+With `$noOldApple`, `$noAndroid`, `$noMs`, `$titleColor` is kept with default values, the `$browserConfigFile` and `$appName` has a not falsy value (a not empty string). The full output will be:
 
-## Ouput HTML link tags
-
-After having images, to tell browsers that you have these favicon, you need include some HTML. Fortunately, this package will do this for you. Two things you need is `Config` and `Html` class.
-
-A configuration, which is an instance of `HieuLe\Favicon\Config` class can be created frin scratch and add more settings later; or created from an PHP array; or from a file that contains JSON string (see the config file above)
-
-```
-use HieuLe\Favicon\Config
-
-$config = new Config;
-$config->allOn()  // turn on all options (all available options are used)
-       ->allOff() // turn off all options (only ico file is used)
-       ->turnOn('touch') // use `touch` option
-       ->turnOff('fav-57') // do not use `fav-57` option
-       ->setTileBackground('#f0f0f0') // use the #f0f0f0 color for windows tile
-
-
-# Config can be imported from an PHP array, invalid options are ignored
-$config = Config::fromArray($array);
-
-# Or via a text file with JSON content
-$config = Config::fromFile('favicon.json');
-
+```html
+<meta name="msapplication-config" content="/IEConfig.xml" />
+<link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png" />
+<link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png" />
+<link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png" />
+<link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png" />
+<link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png" />
+<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+<link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192" />
+<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+<link rel="manifest" href="/manifest.json" />
+<meta name="application-name" content="Hieu Le Favicon" />
+<meta name="msapplication-TileColor" content="#FFFFFF" />
+<meta name="msapplication-TileImage" content="/mstile-144x144.png" />
+<meta name="msapplication-square70x70logo" content="/mstile-70x70.png" />
+<meta name="msapplication-square150x150logo" content="/mstile-150x150.png" />
+<meta name="msapplication-wide310x150logo" content="/mstile-310x150.png" />
+<meta name="msapplication-square310x310logo" content="/mstile-310x310.png" />
 ```
 
-As you can see, the `Config` methods are mostly chainable. 
-
-After create a configuration, we use it to create the HTML dumper and output link tags
-
-```
-$html = new HieuLe\Favicon\HTML($config)
-
-# use in your HTML template
-$html->output();
-```
-
-With the configuration as the example JSON file above, we fill have the following HTML:
-
-```
-<meta name='msapplication-TileColor' content='#F0F0F0'>
-<meta name='msapplication-TileImage' content='/favicon-144.png'>
-<link rel='icon href='/favicon-32.png' sizes='32x32>
-<link rel='apple-touch-icon-precomposed' href='/favicon-152.png'>
-<link rel='apple-touch-icon-precomposed' href='/favicon-57.png'>
-<link rel='apple-touch-icon-precomposed' sizes='152x152' href='/favicon-152.png'>
-<link rel='apple-touch-icon-precomposed' sizes='144x144' href='/favicon-144.png'>
-<link rel='apple-touch-icon-precomposed' sizes='120x120' href='/favicon-120.png'>
-<link rel='apple-touch-icon-precomposed' sizes='114x114' href='/favicon-114.png'>
-<link rel='apple-touch-icon-precomposed' sizes='72x72' href='/favicon-72.png'>
-```
+* if `$noOldApple` is `true`, `link` tags width these sizes will be **removed** from the result 57x57, 60x60, 72x72, 114x114
+* if `$noAndroid` is `true`, `link` tag with `rel="manifest"` will be **removed** from the result
+* if `$noMs` is `true`, `meta` will be **removed** from the result
+* if `$browserConfigFile` is a falsy value (default), the `<meta name="msapplication-config" content="/IEConfig.xml" />` will be replaced by `<meta name="msapplication-config" content="none" />` to prevent IE browser from fetching `browserconfig.xml` file automatically.
+* if `$appName` is a falsy value (default), the `meta` tag named `application-name` will be **removed** from the result.
 
 ## License
 

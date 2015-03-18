@@ -15,7 +15,7 @@ if (!function_exists('favicon'))
      * 
      * @return string 
      */
-    function favicon($noOldApple = false, $noAndroid = false, $noMs = false, $tileColor = '#FFF', $browserConfigFile = '', $appName = '')
+    function favicon($noOldApple = false, $noAndroid = false, $noMs = false, $tileColor = '#FFFFFF', $browserConfigFile = '', $appName = '')
     {
         return HieuLe\Favicon\Html::output($noOldApple, $noAndroid, $noMs, $tileColor, $browserConfigFile, $appName);
     }

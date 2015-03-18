@@ -98,7 +98,7 @@ class GenerateCommand extends Command
                 ->addOption('no-old-apple', null, InputOption::VALUE_NONE, 'Exclude old apple touch images')
                 ->addOption('no-android', null, InputOption::VALUE_NONE, 'Exclude manifest.json and Android images')
                 ->addOption('no-ms', null, InputOption::VALUE_NONE, 'Exclude Windows and IE tile images')
-                ->addOption('app-name', null, InputOption::VALUE_REQUIRED, 'Android manifest app name', "My Application")
+                ->addOption('app-name', null, InputOption::VALUE_REQUIRED, 'Android manifest app name', "")
         ;
     }
 
