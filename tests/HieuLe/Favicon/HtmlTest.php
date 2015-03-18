@@ -10,45 +10,127 @@ namespace HieuLe\Favicon;
 class HtmlTest extends \PHPUnit_Framework_TestCase
 {
 
-//    public function testGetLinkTag()
-//    {
-//        $config = new Config;
-//        $config->allOn();
-//        $html   = new Html($config, 'foo');
-//
-//        $tag = $html->getLinkTag('bar');
-//        $this->assertEquals('', $tag);
-//
-//        $tag = $html->getLinkTag('ms');
-//        $this->assertEquals("<meta name='msapplication-TileColor' content='#FFFFFF'>\n<meta name='msapplication-TileImage' content='foo/favicon-144.png'>", $tag);
-//
-//        $tag = $html->getLinkTag('fav');
-//        $this->assertEquals("<link rel='icon href='foo/favicon-32.png' sizes='32x32>", $tag);
-//
-//        $tag = $html->getLinkTag('fav-57');
-//        $this->assertEquals("<link rel='apple-touch-icon-precomposed' href='foo/favicon-57.png'>", $tag);
-//
-//        $tag = $html->getLinkTag('touch');
-//        $this->assertEquals("<link rel='apple-touch-icon-precomposed' href='foo/favicon-152.png'>", $tag);
-//
-//        $tag = $html->getLinkTag('touch-72');
-//        $this->assertEquals("<link rel='apple-touch-icon-precomposed' sizes='72x72' href='foo/favicon-72.png'>", $tag);
-//
-//        $tag = $html->getLinkTag('touch-114');
-//        $this->assertEquals("<link rel='apple-touch-icon-precomposed' sizes='114x114' href='foo/favicon-114.png'>", $tag);
-//    }
-//
-//    public function testOutput()
-//    {
-//        $config = new Config;
-//        $config->setTileBackground('#f0f0f0')
-//                ->turnOn('ms')
-//                ->turnOn('fav');
-//        $html   = new Html($config, 'foo');
-//
-//        $expected = "<meta name='msapplication-TileColor' content='#F0F0F0'>\n<meta name='msapplication-TileImage' content='foo/favicon-144.png'>\n<link rel='icon href='foo/favicon-32.png' sizes='32x32>";
-//
-//        $this->assertEquals($expected, $html->output());
-//    }
+    public function testOutputNoConfig()
+    {
+        $expected = array(
+            '<meta name="msapplication-config" content="none" />',
+            '<link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png" />',
+            '<link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png" />',
+            '<link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png" />',
+            '<link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png" />',
+            '<link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png" />',
+            '<link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png" />',
+            '<link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png" />',
+            '<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png" />',
+            '<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />',
+            '<link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192" />',
+            '<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />',
+            '<link rel="manifest" href="/manifest.json" />',
+            '<meta name="msapplication-TileColor" content="#FFFFFF" />',
+            '<meta name="msapplication-TileImage" content="/mstile-144x144.png" />',
+            '<meta name="msapplication-square70x70logo" content="/mstile-70x70.png" />',
+            '<meta name="msapplication-square150x150logo" content="/mstile-150x150.png" />',
+            '<meta name="msapplication-wide310x150logo" content="/mstile-310x150.png" />',
+            '<meta name="msapplication-square310x310logo" content="/mstile-310x310.png" />',
+        );
+        $html     = Html::output();
+        $this->assertEquals(implode("\n", $expected), $html);
+    }
+
+    public function testOutputNoOldApple()
+    {
+        $expected = array(
+            '<meta name="msapplication-config" content="none" />',
+            '<link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png" />',
+            '<link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png" />',
+            '<link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png" />',
+            '<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png" />',
+            '<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />',
+            '<link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192" />',
+            '<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />',
+            '<link rel="manifest" href="/manifest.json" />',
+            '<meta name="msapplication-TileColor" content="#FFFFFF" />',
+            '<meta name="msapplication-TileImage" content="/mstile-144x144.png" />',
+            '<meta name="msapplication-square70x70logo" content="/mstile-70x70.png" />',
+            '<meta name="msapplication-square150x150logo" content="/mstile-150x150.png" />',
+            '<meta name="msapplication-wide310x150logo" content="/mstile-310x150.png" />',
+            '<meta name="msapplication-square310x310logo" content="/mstile-310x310.png" />',
+        );
+        $html     = Html::output(true);
+        $this->assertEquals(implode("\n", $expected), $html);
+    }
+
+    public function testOutputNoAndroid()
+    {
+        $expected = array(
+            '<meta name="msapplication-config" content="none" />',
+            '<link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png" />',
+            '<link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png" />',
+            '<link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png" />',
+            '<link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png" />',
+            '<link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png" />',
+            '<link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png" />',
+            '<link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png" />',
+            '<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png" />',
+            '<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />',
+            '<link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192" />',
+            '<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />',
+            '<meta name="msapplication-TileColor" content="#FFFFFF" />',
+            '<meta name="msapplication-TileImage" content="/mstile-144x144.png" />',
+            '<meta name="msapplication-square70x70logo" content="/mstile-70x70.png" />',
+            '<meta name="msapplication-square150x150logo" content="/mstile-150x150.png" />',
+            '<meta name="msapplication-wide310x150logo" content="/mstile-310x150.png" />',
+            '<meta name="msapplication-square310x310logo" content="/mstile-310x310.png" />',
+        );
+        $html     = Html::output(false, true);
+        $this->assertEquals(implode("\n", $expected), $html);
+    }
+    
+    public function testOutputNoMs()
+    {
+        $expected = array(
+            '<link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png" />',
+            '<link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png" />',
+            '<link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png" />',
+            '<link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png" />',
+            '<link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png" />',
+            '<link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png" />',
+            '<link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png" />',
+            '<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png" />',
+            '<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />',
+            '<link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192" />',
+            '<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />',
+            '<link rel="manifest" href="/manifest.json" />',
+        );
+        $html     = Html::output(false, false, true);
+        $this->assertEquals(implode("\n", $expected), $html);
+    }
+    
+    public function testOutputFullMsInfo() {
+        $expected = array(
+            '<meta name="msapplication-config" content="/IEConfig.xml" />',
+            '<link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png" />',
+            '<link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png" />',
+            '<link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png" />',
+            '<link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png" />',
+            '<link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png" />',
+            '<link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png" />',
+            '<link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png" />',
+            '<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png" />',
+            '<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />',
+            '<link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192" />',
+            '<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />',
+            '<link rel="manifest" href="/manifest.json" />',
+            '<meta name="application-name" content="Foo App" />',
+            '<meta name="msapplication-TileColor" content="#F0F0F0" />',
+            '<meta name="msapplication-TileImage" content="/mstile-144x144.png" />',
+            '<meta name="msapplication-square70x70logo" content="/mstile-70x70.png" />',
+            '<meta name="msapplication-square150x150logo" content="/mstile-150x150.png" />',
+            '<meta name="msapplication-wide310x150logo" content="/mstile-310x150.png" />',
+            '<meta name="msapplication-square310x310logo" content="/mstile-310x310.png" />',
+        );
+        $html     = Html::output(false, false, false, '#F0F0F0', 'IEConfig.xml', 'Foo App');
+        $this->assertEquals(implode("\n", $expected), $html);
+    }
 
 }

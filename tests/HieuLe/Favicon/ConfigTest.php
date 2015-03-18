@@ -23,7 +23,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayNotHasKey('apple-touch-icon-57x57.png', $sizes);
         $this->assertArrayNotHasKey('apple-touch-icon-60x60.png', $sizes);
         $this->assertArrayNotHasKey('apple-touch-icon-72x72.png', $sizes);
-        $this->assertArrayNotHasKey('apple-touch-icon-144x144.png', $sizes);
+        $this->assertArrayNotHasKey('apple-touch-icon-114x114.png', $sizes);
     }
 
     public function testgetSizesNoAndroid()
@@ -52,6 +52,26 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     {
         $sizes = Config::getSizes(true, true, true);
         $this->assertCount(9, $sizes);
+    }
+    
+    public function testGetTileSettings()
+    {
+        $opt = Config::getTileSettings('mstile-310x310.png');
+        $this->assertCount(5, $opt);
+        $this->assertArrayHasKey('w', $opt);
+        $this->assertArrayHasKey('h', $opt);
+        $this->assertArrayHasKey('icon', $opt);
+        $this->assertArrayHasKey('top', $opt);
+        $this->assertArrayHasKey('left', $opt);
+    }
+    
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testGetTileSettingsError()
+    {
+        $opt = Config::getTileSettings('mstile-300x300.png');
+        
     }
 
 }

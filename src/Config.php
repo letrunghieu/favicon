@@ -87,7 +87,7 @@ class Config
             unset($result['apple-touch-icon-57x57.png']);
             unset($result['apple-touch-icon-60x60.png']);
             unset($result['apple-touch-icon-72x72.png']);
-            unset($result['apple-touch-icon-144x144.png']);
+            unset($result['apple-touch-icon-114x114.png']);
         }
         if ($noAndroid)
         {
@@ -108,8 +108,19 @@ class Config
         return $result;
     }
 
+    /**
+     * Get the settings for Windows tile image size
+     * 
+     * @param type $name
+     * @return array
+     * @throws \RuntimeException
+     */
     public static function getTileSettings($name)
     {
+        if (!isset(self::$_tileSettings[$name]))
+        {
+            throw new \RuntimeException('Invalid image name');
+        }
         return self::$_tileSettings[$name];
     }
 
