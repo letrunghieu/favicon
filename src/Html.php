@@ -10,6 +10,18 @@ namespace HieuLe\Favicon;
 class Html
 {
 
+    /**
+     * Write meta and link tags
+     * 
+     * @param bool $noOldApple exclude old apple touch link
+     * @param bool $noAndroid exclude android manifest.json file
+     * @param bool $noMs exclude msapplication meta tags
+     * @param tring $tileColor the color of Windows tile
+     * @param string $browserConfigFile the path to browserconfig.xml file or null to disable this
+     * @param string $appName the name of application when pinned
+     * 
+     * @return string 
+     */
     public static function output($noOldApple = false, $noAndroid = false, $noMs = false, $tileColor = '#FFF', $browserConfigFile = '', $appName = '')
     {
         $result = array();
