@@ -57,32 +57,6 @@ class GenerateCommand extends Command
      */
     private $_use48Icon;
     
-    private static $_sizes = array(
-        'favicon-16x16.png' => 16,
-        'favicon-32x32.png' => 32,
-        'favicon-96x96.png' => 96,
-        'android-chrome-36x36.png' => 36,
-        'android-chrome-48x48.png' => 48,
-        'android-chrome-72x72.png' => 72,
-        'android-chrome-96x96.png' => 96,
-        'android-chrome-144x144.png' => 144,
-        'android-chrome-192x192.png' => 192,
-        'mstile-70x70.png' => 70,
-        'mstile-144x144.png' => 144,
-        'mstile-150x150.png' => 150,
-        'mstile-310x310.png' => 310,
-        'mstile-310x150.png' => array(310, 150),
-        'apple-touch-icon.png' => 57,
-        'apple-touch-icon-57x57.png' => 57,
-        'apple-touch-icon-60x60.png' => 60,
-        'apple-touch-icon-72x72.png' => 72,
-        'apple-touch-icon-76x76.png' => 76,
-        'apple-touch-icon-120x120.png' => 120,
-        'apple-touch-icon-144x144.png' => 144,
-        'apple-touch-icon-152x152.png' => 152,
-        'apple-touch-icon-180x180.png' => 180,
-    );
-
     protected function configure()
     {
         $this

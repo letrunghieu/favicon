@@ -11,240 +11,71 @@ class Config
 {
 
     /**
-     * Name of PNG sizes that we want to generate favicon
+     * All available sizes
      *
-     * @var array
-     */
-    private $_turnedOnSizes = array();
-
-    /**
-     * The background color of Windows tite
-     *
-     * @var type 
-     */
-    private $_msapplicationTileColor = '#FFFFFF';
-
-    /**
-     * Supported PNG sizes and its description
-     *
-     * @var type 
+     * @var array 
      */
     private static $_sizes = array(
-        // general icons
-        'touch'     => array(
-            'size'  => 152,
-            'label' => 'Touch icon for iOS 2.0+ and Android 2.1+',
-        ),
-        'fav'       => array(
-            'size'  => 32,
-            'label' => 'Favicons targeted to any additional png sizes',
-        ),
-        'fav-57'    => array(
-            'size'  => 57,
-            'label' => 'For non-Retina iPhone, iPod Touch, and Android 2.1+ devices',
-        ),
-        'ms'        => array(
-            'size'  => 144,
-            'label' => 'IE 10 Metro tile icon (Metro equivalent of apple-touch-icon)',
-        ),
-        // touch icons
-        'touch-152' => array(
-            'size'  => 152,
-            'label' => 'For iPad with high-resolution Retina display running iOS ≥ 7',
-        ),
-        'touch-144' => array(
-            'size'  => 144,
-            'label' => 'For iPad with high-resolution Retina display running iOS ≤ 6',
-        ),
-        'touch-120' => array(
-            'size'  => 120,
-            'label' => 'For iPhone with high-resolution Retina display running iOS ≥ 7',
-        ),
-        'touch-114' => array(
-            'size'  => 114,
-            'label' => 'For iPhone with high-resolution Retina display running iOS ≤ 6',
-        ),
-        'touch-72'  => array(
-            'size'  => 72,
-            'label' => 'For first- and second-generation iPad',
-        ),
+        'favicon-16x16.png'            => 16,
+        'favicon-32x32.png'            => 32,
+        'favicon-96x96.png'            => 96,
+        'android-chrome-36x36.png'     => 36,
+        'android-chrome-48x48.png'     => 48,
+        'android-chrome-72x72.png'     => 72,
+        'android-chrome-96x96.png'     => 96,
+        'android-chrome-144x144.png'   => 144,
+        'android-chrome-192x192.png'   => 192,
+        'mstile-70x70.png'             => 70,
+        'mstile-144x144.png'           => 144,
+        'mstile-150x150.png'           => 150,
+        'mstile-310x310.png'           => 310,
+        'mstile-310x150.png'           => array(310, 150),
+        'apple-touch-icon.png'         => 57,
+        'apple-touch-icon-57x57.png'   => 57,
+        'apple-touch-icon-60x60.png'   => 60,
+        'apple-touch-icon-72x72.png'   => 72,
+        'apple-touch-icon-76x76.png'   => 76,
+        'apple-touch-icon-144x144.png' => 144,
+        'apple-touch-icon-120x120.png' => 120,
+        'apple-touch-icon-152x152.png' => 152,
+        'apple-touch-icon-180x180.png' => 180,
     );
 
     /**
-     * Generate PNG favicon for all sizes
+     * Return sizes from options
      * 
-     * @return \HieuLe\Favicon\Config
-     */
-    public function allOn()
-    {
-        foreach (self::$_sizes as $name => $_)
-        {
-            $this->_turnedOnSizes[$name] = true;
-        }
-        return $this;
-    }
-
-    /**
-     * Do not generate any PNG favicon
-     * 
-     * @return \HieuLe\Favicon\Config
-     */
-    public function allOff()
-    {
-        $this->_turnedOnSizes = array();
-        return $this;
-    }
-
-    /**
-     * Generate PNG favicon for this size
-     * 
-     * @param string $size
-     * @return \HieuLe\Favicon\Config
-     */
-    public function turnOn($size)
-    {
-        if (isset(self::$_sizes[$size]))
-        {
-            $this->_turnedOnSizes[$size] = true;
-        }
-        return $this;
-    }
-
-    /**
-     * Do not generate PNG for this size
-     * 
-     * @param string $size
-     * @return \HieuLe\Favicon\Config
-     */
-    public function turnOff($size)
-    {
-        if (isset($this->_turnedOnSizes[$size]))
-        {
-            unset($this->_turnedOnSizes[$size]);
-        }
-        return $this;
-    }
-
-    /**
-     * Set the background color for Windows tile
-     * 
-     * @param string $hexColor hex value of background color (e.g: #000000)
-     * @return \HieuLe\Favicon\Config
-     */
-    public function setTileBackground($hexColor)
-    {
-        $this->_msapplicationTileColor = strtoupper($hexColor);
-        return $this;
-    }
-
-    /**
-     * Get Windows tile background color
-     * 
-     * @return string
-     */
-    public function getTileBackground()
-    {
-        return $this->_msapplicationTileColor;
-    }
-
-    /**
-     * Get turned on sizes name and width as an array (name => width)
-     * 
-     * @return type
-     */
-    public function getTurnedOnSizes()
-    {
-        $result = array();
-        foreach ($this->_turnedOnSizes as $size => $on)
-        {
-            if ($on)
-            {
-                $result[$size] = self::$_sizes[$size]['size'];
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * Export configuration data as an array
-     * 
+     * @param bool $noOldApple exclude old Apple touch image sizes
+     * @param bool $noAndroid exclude manifest.json file and images for Androids
+     * @param bool $noMs exclude images for Windows and IE11 
      * @return array
      */
-    public function toArray()
+    public static function getSizes($noOldApple = false, $noAndroid = false, $noMs = false)
     {
-        $result = array(
-            'sizes'         => array(),
-            'ms-tile-color' => $this->_msapplicationTileColor,
-        );
-        foreach ($this->_turnedOnSizes as $size => $on)
+        $result = array_merge(self::$_sizes, array());
+        if ($noOldApple)
         {
-            if ($on)
-            {
-                $result['sizes'][$size] = 1;
-            }
+            unset($result['apple-touch-icon-57x57.png']);
+            unset($result['apple-touch-icon-60x60.png']);
+            unset($result['apple-touch-icon-72x72.png']);
+            unset($result['apple-touch-icon-144x144.png']);
+        }
+        if ($noAndroid)
+        {
+            unset($result['android-chrome-36x36.png']);
+            unset($result['android-chrome-48x48.png']);
+            unset($result['android-chrome-72x72.png']);
+            unset($result['android-chrome-96x96.png']);
+            unset($result['android-chrome-144x144.png']);
+        }
+        if ($noMs)
+        {
+            unset($result['mstile-70x70.png']);
+            unset($result['mstile-144x144.png']);
+            unset($result['mstile-150x150.png']);
+            unset($result['mstile-310x310.png']);
+            unset($result['mstile-310x150.png']);
         }
         return $result;
-    }
-
-    /**
-     * Export config data into a file
-     * 
-     * @param string $path
-     * @return boolean
-     */
-    public function toFile($path)
-    {
-        $array = $this->toArray();
-        return file_put_contents($path, json_encode($array, JSON_PRETTY_PRINT));
-    }
-
-    /**
-     * Get supported PNG sizes and description
-     * 
-     * @return array
-     */
-    public static function getSizes()
-    {
-        return self::$_sizes;
-    }
-
-    /**
-     * Create a configuration object from an array
-     * 
-     * @param array $array
-     * @return \HieuLe\Favicon\Config
-     */
-    public static function fromArray(array $array)
-    {
-        $config = new Config;
-        if (isset($array['sizes']) && is_array($array['sizes']))
-        {
-            foreach ($array['sizes'] as $size => $on)
-            {
-                if ($on)
-                {
-                    $config->turnOn($size);
-                }
-            }
-        }
-        if (isset($array['ms-tile-color']) && is_string($array['ms-tile-color']))
-        {
-            $config->setTileBackground($array['ms-tile-color']);
-        }
-
-        return $config;
-    }
-
-    /**
-     * Parse configuration from a file
-     * 
-     * @param string $path
-     * @return \HieuLe\Favicon\Config
-     */
-    public static function fromFile($path)
-    {
-        $array = json_decode(file_get_contents($path), true);
-        return self::fromArray($array);
     }
 
 }
