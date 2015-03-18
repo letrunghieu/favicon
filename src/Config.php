@@ -15,7 +15,7 @@ class Config
      *
      * @var array 
      */
-    private static $_sizes = array(
+    private static $_sizes        = array(
         'favicon-16x16.png'            => 16,
         'favicon-32x32.png'            => 32,
         'favicon-96x96.png'            => 96,
@@ -35,10 +35,40 @@ class Config
         'apple-touch-icon-60x60.png'   => 60,
         'apple-touch-icon-72x72.png'   => 72,
         'apple-touch-icon-76x76.png'   => 76,
-        'apple-touch-icon-144x144.png' => 144,
+        'apple-touch-icon-114x114.png' => 114,
         'apple-touch-icon-120x120.png' => 120,
         'apple-touch-icon-152x152.png' => 152,
         'apple-touch-icon-180x180.png' => 180,
+    );
+    private static $_tileSettings = array(
+        'mstile-70x70.png'   => array(
+            'w'    => 126,
+            'h'    => 126,
+            'icon' => 100,
+            'top'  => 13,
+            'left' => 13,
+        ),
+        'mstile-150x150.png' => array(
+            'w'    => 270,
+            'h'    => 270,
+            'icon' => 124,
+            'top'  => 73,
+            'left' => 50,
+        ),
+        'mstile-310x310.png' => array(
+            'w'    => 558,
+            'h'    => 558,
+            'icon' => 260,
+            'top'  => 149,
+            'left' => 128,
+        ),
+        'mstile-310x150.png' => array(
+            'w'    => 558,
+            'h'    => 270,
+            'icon' => 130,
+            'top'  => 214,
+            'left' => 45,
+        ),
     );
 
     /**
@@ -76,6 +106,11 @@ class Config
             unset($result['mstile-310x150.png']);
         }
         return $result;
+    }
+
+    public static function getTileSettings($name)
+    {
+        return self::$_tileSettings[$name];
     }
 
 }

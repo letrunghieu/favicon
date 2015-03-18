@@ -10,73 +10,50 @@ namespace HieuLe\Favicon;
 class Html
 {
 
-    /**
-     * The prefix of `href` attribute before the favicon file name
-     *
-     * @var string
-     */
-    private $_urlPrefix;
-
-    /**
-     * The config object
-     *
-     * @var \HieuLe\Favicon\Config
-     */
-    private $_config;
-
-    /**
-     * Availabel PNG sizes
-     * 
-     * @var array
-     */
-    private $_availabelSizes = array();
-
-    public function __construct(Config $config, $prefix = '')
+    public static function output($noOldApple = false, $noAndroid = false, $noMs = false, $tileColor = '#FFF', $browserConfigFile = '', $appName = '')
     {
-        $this->_config         = $config;
-        $this->_urlPrefix      = $prefix;
-        $this->_availabelSizes = Config::getSizes();
-    }
+        $result = array();
+        if (!$browserConfigFile)
+        {
+            $result[] = '<meta name="msapplication-config" content="none"/>';
+        }
+        else
+        {
+            $result[] = '<meta name="msapplication-config" content="' . $browserConfigFile . '" />';
+        }
+        if (!$noOldApple)
+        {
+            $result[] = '<link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">';
+            $result[] = '<link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">';
+            $result[] = '<link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">';
+            $result[] = '<link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">';
+        }
+        $result[] = '<link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">';
+        $result[] = '<link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">';
+        $result[] = '<link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">';
+        $result[] = '<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">';
+        $result[] = '<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">';
+        $result[] = '<link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192">';
+        $result[] = '<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">';
+        if (!$noAndroid)
+        {
+            $result[] = '<link rel="manifest" href="/manifest.json">';
+        }
+        if (!$noMs)
+        {
+            if ($appName)
+            {
+                $result[] = '<meta name="application-name" content="' . $appName . '">';
+            }
+            $result[] = '<meta name="msapplication-TileColor" content="' . $tileColor . '">';
+            $result[] = '<meta name="msapplication-TileImage" content="/mstile-144x144.png">';
+            $result[] = '<meta name="msapplication-square70x70logo" content="/mstile-70x70.png">';
+            $result[] = '<meta name="msapplication-square150x150logo" content="/mstile-150x150.png">';
+            $result[] = '<meta name="msapplication-wide310x150logo" content="/mstile-310x150.png">';
+            $result[] = '<meta name="msapplication-square310x310logo" content="/mstile-310x310.png">';
+        }
 
-    /**
-     * Output HTML link tags for all turned on favicon sizes
-     * 
-     * @return string
-     */
-    public function output()
-    {
-        return implode("\n", array_map(array($this, 'getLinkTag'), array_keys($this->_config->getTurnedOnSizes())));
-    }
-
-    /**
-     * Get tjhe Link tag for a favicon size
-     * 
-     * @param string $pngSizeName
-     * @return string
-     */
-    public function getLinkTag($pngSizeName)
-    {
-        if (!isset($this->_availabelSizes[$pngSizeName]))
-        {
-            return '';
-        }
-        if ($pngSizeName === 'ms')
-        {
-            $color  = $this->_config->getTileBackground();
-            $tags[] = "<meta name='msapplication-TileColor' content='{$color}'>";
-            $tags[] = "<meta name='msapplication-TileImage' content='{$this->_urlPrefix}/favicon-144.png'>";
-            return implode("\n", $tags);
-        }
-        if ($pngSizeName === 'fav')
-        {
-            return "<link rel='icon href='{$this->_urlPrefix}/favicon-32.png' sizes='32x32>";
-        }
-        $size = $this->_availabelSizes[$pngSizeName]['size'];
-        if ($pngSizeName === 'fav-57' || $pngSizeName == 'touch')
-        {
-            return "<link rel='apple-touch-icon-precomposed' href='{$this->_urlPrefix}/favicon-{$size}.png'>";
-        }
-        return "<link rel='apple-touch-icon-precomposed' sizes='{$size}x{$size}' href='{$this->_urlPrefix}/favicon-{$size}.png'>";
+        return implode("\n", $result);
     }
 
 }

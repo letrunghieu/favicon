@@ -177,14 +177,25 @@ class GenerateCommand extends Command
 
     private function _generatePngs(OutputInterface $output)
     {
-        $sizes = Config::getSizes($this->_noOldApple, $this->_noAndroid, $this->_noMs);
+        $sizes         = Config::getSizes($this->_noOldApple, $this->_noAndroid, $this->_noMs);
+        $originalImage = $this->_imagine->open($this->_inputFile)->strip();
+        $pallete       = new \Imagine\Image\Palette\RGB();
+        $background    = $pallete->color('#000', 0);
         foreach ($sizes as $imageName => $size)
         {
             $output->writeln("Creating: <info>{$imageName}</info>");
             $imagePath = $this->_outputFolder . $imageName;
-            if (!is_array($size))
+            if (substr($imageName, 0, 6) == 'mstile' && $size != 144)
             {
-                $originalImage = $this->_imagine->open($this->_inputFile)->strip();
+                $opt  = Config::getTileSettings($imageName);
+                $tile = $this->_imagine->create(new \Imagine\Image\Box($opt['w'], $opt['h']), $background);
+                $tile->paste(
+                        $originalImage->copy()->resize(new \Imagine\Image\Box($opt['icon'], $opt['icon'])), new \Imagine\Image\Point($opt['top'], $opt['left'])
+                );
+                $tile->save($imagePath);
+            }
+            else
+            {
                 $originalImage->copy()
                         ->resize(new \Imagine\Image\Box($size, $size))
                         ->save($imagePath);
