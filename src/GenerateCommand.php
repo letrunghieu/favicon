@@ -56,7 +56,35 @@ class GenerateCommand extends Command
      * @var bool 
      */
     private $_use48Icon;
-    
+
+    /**
+     * Exclude old apple touch images
+     *
+     * @var type 
+     */
+    private $_noOldApple;
+
+    /**
+     * Exclude manifest.json and Android images
+     * 
+     * @var type 
+     */
+    private $_noAndroid;
+
+    /**
+     * Exclude Windows and IE tile images
+     *
+     * @var type 
+     */
+    private $_noMs;
+
+    /**
+     * Android manifest app name
+     *
+     * @var string
+     */
+    private $_appName;
+
     protected function configure()
     {
         $this
@@ -67,6 +95,10 @@ class GenerateCommand extends Command
                 ->addOption('use-gd', 'g', InputOption::VALUE_NONE, 'Use GD extension instead of default Imagick extension')
                 ->addOption('ico-64', null, InputOption::VALUE_NONE, 'Include 64x64 image in the ICO file (larger file size)')
                 ->addOption('ico-48', null, InputOption::VALUE_NONE, 'Include 48x48 image in the ICO file (larger file size)')
+                ->addOption('no-old-apple', null, InputOption::VALUE_NONE, 'Exclude old apple touch images')
+                ->addOption('no-android', null, InputOption::VALUE_NONE, 'Exclude manifest.json and Android images')
+                ->addOption('no-ms', null, InputOption::VALUE_NONE, 'Exclude Windows and IE tile images')
+                ->addOption('app-name', null, InputOption::VALUE_REQUIRED, 'Android manifest app name', "My Application")
         ;
     }
 
@@ -75,6 +107,13 @@ class GenerateCommand extends Command
         $this->_prepare($input, $output);
 
         $this->_generateIco($output);
+
+        $this->_generatePngs($output);
+
+        if (!$this->_noAndroid)
+        {
+            $this->_generateManifestJson($output);
+        }
     }
 
     private function _prepare(InputInterface $input, OutputInterface $output)
@@ -84,11 +123,17 @@ class GenerateCommand extends Command
         $this->_inputFile    = $input->getArgument('input');
         $this->_use64Icon    = $input->getOption('ico-64');
         $this->_use48Icon    = $input->getOption('ico-48');
+        $this->_noOldApple   = $input->getOption('no-old-apple');
+        $this->_noAndroid    = $input->getOption('no-android');
+        $this->_noMs         = $input->getOption('no-ms');
+        $this->_appName      = $input->getOption('app-name');
 
         if (!file_exists($this->_inputFile) && !is_file($this->_inputFile))
         {
             $output->writeln("<error>Input file does not exist: {$this->_inputFile}</error>");
         }
+
+        mkdir($this->_outputFolder, 0755, true);
     }
 
     /**
@@ -103,17 +148,16 @@ class GenerateCommand extends Command
         $filename = $this->_outputFolder . "favicon.ico";
         $output->writeln("Creating: <info>{$filename}</info>");
 
-        $imagine = new \Imagine\Imagick\Imagine();
 
-        $originalImage = $imagine->open($this->_inputFile)->strip();
+        $originalImage = $this->_imagine->open($this->_inputFile)->strip();
         $originalImage->copy()
                 ->resize(new \Imagine\Image\Box(16, 16))
                 ->save('tmp-16.bmp');
 
-        $icon = $imagine->open('tmp-16.bmp');
+        $icon = $this->_imagine->open('tmp-16.bmp');
         $icon->layers()
                 ->add($originalImage->copy()->resize(new \Imagine\Image\Box(32, 32)));
-        
+
         if ($this->_use48Icon)
         {
             $icon->layers()->add($originalImage->copy()->resize(new \Imagine\Image\Box(48, 48)));
@@ -129,6 +173,44 @@ class GenerateCommand extends Command
 
         unlink('tmp-16.bmp');
         return true;
+    }
+
+    private function _generatePngs(OutputInterface $output)
+    {
+        $sizes = Config::getSizes($this->_noOldApple, $this->_noAndroid, $this->_noMs);
+        foreach ($sizes as $imageName => $size)
+        {
+            $output->writeln("Creating: <info>{$imageName}</info>");
+            $imagePath = $this->_outputFolder . $imageName;
+            if (!is_array($size))
+            {
+                $originalImage = $this->_imagine->open($this->_inputFile)->strip();
+                $originalImage->copy()
+                        ->resize(new \Imagine\Image\Box($size, $size))
+                        ->save($imagePath);
+            }
+        }
+    }
+
+    private function _generateManifestJson(OutputInterface $output)
+    {
+        $output->writeln("Creating: <info>manifest.json</info>");
+        $manifest = array(
+            'name'  => $this->_appName,
+            'icons' => array(),
+        );
+        foreach (array(36, 48, 72, 96, 144, 192) as $size)
+        {
+            $manifest['icons'][] = array(
+                'src'     => "/android-chrome-{$size}x{$size}.png",
+                'sizes'   => "{$size}x{$size}",
+                'type'    => "image/png",
+                'density' => round($size / 48.0, 2)
+            );
+        }
+        $json         = json_encode($manifest, JSON_PRETTY_PRINT);
+        $jsonFilePath = $this->_outputFolder . "manifest.json";
+        file_put_contents($jsonFilePath, $json);
     }
 
     /**
