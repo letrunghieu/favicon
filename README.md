@@ -30,7 +30,7 @@ Run `composer update` and start using.
 To use the command line to to generate favicon files: 
 
 ```
-$ vendor/bin/favicon generate [-g|--use-gd] [--ico-64] [--ico-48] [--no-old-apple] [--no-android] [--no-ms] [--app-name="..."] input [output]
+$ vendor/bin/favicon generate [--ico-64] [--ico-48] [--no-old-apple] [--no-android] [--no-ms] [--app-name="..."] input [output]
 ```
 
 Arguments:
