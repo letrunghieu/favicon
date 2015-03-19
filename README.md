@@ -15,7 +15,7 @@ In more details, it supports:
 
 ## Installation
 
-We need [PHP imagick extension](http://php.net/manual/en/book.imagick.php) or [PHP GD extension](http://php.net/manual/en/book.image.php) for generating images. By default, the Imagick extension is loaded, if you cannot install it, you can switch to using GD via command line option.
+We need [PHP imagick extension](http://php.net/manual/en/book.imagick.php) or [PHP GD extension](http://php.net/manual/en/book.image.php) for generating images. By default, the Imagick extension is loaded, if you cannot install it, you can switch to using GD ~~via command line option~~ if available.
 
 You will need (Composer)[] to use this package. After install Composer, add this dependency into your `composer.json` file.
 
@@ -40,7 +40,7 @@ Arguments:
 
 Options:
 
-* `--use-gd`: use GD extension instead of Imagick extension
+* ~~`--use-gd`: use GD extension instead of Imagick extension~~ The Imagick ext is used by default. GD library is used if cannot load Imagick ext.
 * `--ico-64`: include the 64x64 image inside the output ICO file (which contains only 16x16 and 32x32 images by default)
 * `--ico-48`: include the 48x48 image inside the output ICO file (which contains only 16x16 and 32x32 images by default). Both `--ico-48` and `--ico-64` options make the output icon file larger a lot.
 * `--no-old-apple`: exclude pngs files that used by old Apple touch devices
@@ -53,10 +53,37 @@ Options:
 Call the `favicon` function inside your HTML template as follow:
 
 ```php
-echo favicon($noOldApple = false, $noAndroid = false, $noMs = false, $tileColor = '#FFFFFF', $browserConfigFile = '', $appName = '')
+echo favicon($option = FAVICON_ENABLE_ALL, array $msOptions = array())
 ```
 
-With `$noOldApple`, `$noAndroid`, `$noMs`, `$titleColor` is kept with default values, the `$browserConfigFile` and `$appName` has a not falsy value (a not empty string). The full output will be:
+The `$option` argument is a bitmask with following bit:
+
+* `FAVICON_NO_OLD_APPLE` :  do not include old apple touch `link` tags
+* `FAVICON_NO_ANDROID` : do not include Android `manifest.xml` link tag
+* `FAVICON_NO_MS` : do not include Windows and IE `meta` tags
+
+The default value is `FAVICON_ENABLE_ALL` turns of all these three bit and include everything in the final output. Here are some examples:
+
+* To exclude old apple touch `link` tags: `FAVICON_NO_OLD_APPLE`
+* To exclude Android manifest file and IE `meta` tags: `FAVICON_NO_ANDROID | FAVICON_NO_MS`
+* To exclude all these additional tags: `FAVICON_NO_OLD_APPLE | FAVICON_NO_ANDROID | FAVICON_NO_MS`
+
+The `$msOptions` argument is an array contains information for Windows and IE. It can has these fields:
+
+* `tile_color`: the background of live tile when this site is pinned, default is white (`#ffffff`)
+* `browser_config_file`: the path to browser config XML file if you have it. By default, it is set to an empty string to prevent IE from auto looking `browserconfig.xml` file
+* `application_name`: the default application name displayed when user pinned this site
+
+The result of 
+
+```php
+echo favicon(FAVICON_ENABLE_ALL, array(
+  'tile_color' => '#F0F0F0', 
+  'browser_config_file' => 'IEConfig.xml', 
+  'application_name' => 'Hieu Le Favicon'
+));
+```
+is a HTML segment link this:
 
 ```html
 <meta name="msapplication-config" content="/IEConfig.xml" />
@@ -73,7 +100,7 @@ With `$noOldApple`, `$noAndroid`, `$noMs`, `$titleColor` is kept with default va
 <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
 <link rel="manifest" href="/manifest.json" />
 <meta name="application-name" content="Hieu Le Favicon" />
-<meta name="msapplication-TileColor" content="#FFFFFF" />
+<meta name="msapplication-TileColor" content="#F0F0F0" />
 <meta name="msapplication-TileImage" content="/mstile-144x144.png" />
 <meta name="msapplication-square70x70logo" content="/mstile-70x70.png" />
 <meta name="msapplication-square150x150logo" content="/mstile-150x150.png" />
@@ -81,11 +108,6 @@ With `$noOldApple`, `$noAndroid`, `$noMs`, `$titleColor` is kept with default va
 <meta name="msapplication-square310x310logo" content="/mstile-310x310.png" />
 ```
 
-* if `$noOldApple` is `true`, `link` tags width these sizes will be **removed** from the result 57x57, 60x60, 72x72, 114x114
-* if `$noAndroid` is `true`, `link` tag with `rel="manifest"` will be **removed** from the result
-* if `$noMs` is `true`, `meta` will be **removed** from the result
-* if `$browserConfigFile` is a falsy value (default), the `<meta name="msapplication-config" content="/IEConfig.xml" />` will be replaced by `<meta name="msapplication-config" content="none" />` to prevent IE browser from fetching `browserconfig.xml` file automatically.
-* if `$appName` is a falsy value (default), the `meta` tag named `application-name` will be **removed** from the result.
 
 ## License
 
