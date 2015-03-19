@@ -92,7 +92,6 @@ class GenerateCommand extends Command
                 ->setDescription('Generate favicons from an original PNG image')
                 ->addArgument('input', InputArgument::REQUIRED, 'Input PNG image')
                 ->addArgument('output', InputArgument::OPTIONAL, 'Output folder', './')
-                ->addOption('use-gd', 'g', InputOption::VALUE_NONE, 'Use GD extension instead of default Imagick extension')
                 ->addOption('ico-64', null, InputOption::VALUE_NONE, 'Include 64x64 image in the ICO file (larger file size)')
                 ->addOption('ico-48', null, InputOption::VALUE_NONE, 'Include 48x48 image in the ICO file (larger file size)')
                 ->addOption('no-old-apple', null, InputOption::VALUE_NONE, 'Exclude old apple touch images')
@@ -118,7 +117,7 @@ class GenerateCommand extends Command
 
     private function _prepare(InputInterface $input, OutputInterface $output)
     {
-        $this->_imagine      = $this->_getImagine($input, $output);
+        $this->_imagine      = $this->_getImagine($output);
         $this->_outputFolder = rtrim($input->getArgument('output'), " /") . "/";
         $this->_inputFile    = $input->getArgument('input');
         $this->_use64Icon    = $input->getOption('ico-64');
@@ -133,7 +132,10 @@ class GenerateCommand extends Command
             $output->writeln("<error>Input file does not exist: {$this->_inputFile}</error>");
         }
 
-        mkdir($this->_outputFolder, 0755, true);
+        if (!file_exists($this->_outputFolder) || !is_dir($this->_outputFolder))
+        {
+            mkdir($this->_outputFolder, 0755, true);
+        }
     }
 
     /**
@@ -232,15 +234,23 @@ class GenerateCommand extends Command
      * @param OutputInterface $output
      * @return \Imagine\Image\AbstractImagine
      */
-    private function _getImagine(InputInterface $input, OutputInterface $output)
+    private function _getImagine(OutputInterface $output)
     {
-        if ($input->getOption('use-gd'))
+        // Use Imagick extension by default
+        if (extension_loaded('imagick') && class_exists("Imagick"))
         {
-            $output->writeln('GD extension is used.');
+            $output->writeln('Imagick library is used!');
+            return new \Imagine\Imagick\Imagine();
+        }
+        // fall back to GD
+        if (extension_loaded('gd') && function_exists('gd_info'))
+        {
+            $output->writeln('GD library is used!');
             return new \Imagine\Gd\Imagine();
         }
-        $output->writeln('Imagick extension is used.');
-        return new \Imagine\Imagick\Imagine();
+        // Quit if can not find both extensions
+        $output->writeln("<error>The `imagick` or `gd` extension must be loaded to generate image</error>");
+        exit(1);
     }
 
 }
